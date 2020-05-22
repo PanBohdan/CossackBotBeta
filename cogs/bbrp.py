@@ -117,98 +117,28 @@ class BBRP(commands.Cog):
             }
         }
         """
-    # Рол файт зрівнює чи дайс >= КД
-    # Якщо менше:
-    # Надсилає що не попали
-    # Якщо більше:
-    # Кидається окремий дайс на дамаг від n1 до n2
 
-    # Фул_дамаг = Дамаг-КД/2
+    @commands.command()
+    async def rolls(self, ctx, arg):
+        list_of_stats = ['strch', 'fight', 'mobile', 'speech', 'tech', 'erud']
+        if arg in list_of_stats:
+            full_buff = 0
+            for name in roles_names:
+                if name.count(' '+arg) == 1:
+                    buff = name.split(' '+arg)
+                    if name.count('+') == 1:
+                        full_buff += int(buff[0][buff[0].find('+') + 1:])
+                    elif name.count('-') == 1:
+                        full_buff -= int(buff[0][buff[0].find('-') + 1:])
 
-    # Останнє число видається гравцю
-    @commands.command(aliases=['roll_fight'])
-    async def fig(self, ctx, kd: int, n):
-        n1, n2 = n.split('-')
-        n1, n2 = int(n1), int(n2)
-        roles = ctx.message.author.roles
-        roles_names = []
-        d20 = random.randint(1, 20)
-        for role in roles:
-            roles_names.append(role.name)
-        full_buff = 0
-        for name in roles_names:
-            if name.count(' бой') == 1:
-                buff = name.split(' бой')
-                if name.count('+') == 1:
-                    full_buff += int(buff[0][buff[0].find('+') + 1:])
-                elif name.count('-') == 1:
-                    full_buff -= int(buff[0][buff[0].find('-') + 1:])
-            elif name.count(' стат'):
-                buff = name.split(' стат')
-                if name.count('+') == 1:
-                    full_buff += int(buff[0][buff[0].find('+') + 1:])
-                elif name.count('-') == 1:
-                    full_buff -= int(buff[0][buff[0].find('-') + 1:])
-        fight = d20+full_buff
-        
-        if fight >= kd:
-            damage = random.randint(n1, n2)
-            f_damage = damage-int(math.ceil(kd/2))
-            await ctx.send(f'Попав! Дайс на потрапляння {d20}+{full_buff} = {fight}\n {fight} >= КД{kd}\n Дамаг = {damage}-{kd}/2 = {f_damage}')
-        else:
-            await ctx.send(f'Мимо {d20}+{full_buff} = {fight} < {kd}')
-        # if full_buff:
-        #     if full_buff > 0:
-        #         fin_string = f"{d20}(dice)+{full_buff}(fight buff)={d20 + full_buff}"
-        #     else:
-        #         fin_string = f"{d20}(dice){full_buff}(fight buff)={d20 + full_buff}"
-        # else:
-        #     fin_string = f'{d20}(dice)+0(fight buff)={d20}'
-        # await ctx.send(fin_string)
-    fig.__doc__ = """
-        {
-            "en":
-            {
-                "name": "roll_fight (КД) (n1)-(n2)",
-                "description": "None"
-            },
-            "ua":
-            {
-                "name": "None",
-                "description": "None"
-            }
-        }
-        """
-    @commands.command(aliases=['roll_master'])
-    async def mas(self, ctx, arg=0):
-        roles = ctx.message.author.roles
-        roles_names = []
-        d20 = random.randint(1, 20)
-        for role in roles:
-            roles_names.append(role.name)
-        full_buff = 0
-        for name in roles_names:
-            if name.count(' мстр') == 1:
-                buff = name.split(' мстр')
-                if name.count('+') == 1:
-                    full_buff += int(buff[0][buff[0].find('+') + 1:])
-                elif name.count('-') == 1:
-                    full_buff -= int(buff[0][buff[0].find('-') + 1:])
-            elif name.count(' стат'):
-                buff = name.split(' стат')
-                if name.count('+') == 1:
-                    full_buff += int(buff[0][buff[0].find('+') + 1:])
-                elif name.count('-') == 1:
-                    full_buff -= int(buff[0][buff[0].find('-') + 1:])
-
-        if full_buff:
-            if full_buff > 0:
-                fin_string = f"{d20}(dice)+{full_buff}(master buff)={d20 + full_buff}"
+            if full_buff:
+                if full_buff > 0:
+                    fin_string = f"{d20}(dice)+{full_buff}({arg} buff)={d20 + full_buff}"
+                else:
+                    fin_string = f"{d20}(dice){full_buff}({arg} buff)={d20 + full_buff}"
             else:
-                fin_string = f"{d20}(dice){full_buff}(master buff)={d20 + full_buff}"
-        else:
-            fin_string = f'{d20}(dice)+0(master buff)={d20}'
-        await ctx.send(fin_string)
+                fin_string = f'{d20}(dice)+0(master buff)={d20}'
+            await ctx.send(fin_string)
     mas.__doc__ = """
         {
             "en":
@@ -223,78 +153,16 @@ class BBRP(commands.Cog):
             }
         }
         """
-    @commands.command(aliases=['roll_oratory'])
-    async def ora(self, ctx, arg=0):
-        roles = ctx.message.author.roles
-        roles_names = []
-        d20 = random.randint(1, 20)
-        for role in roles:
-            roles_names.append(role.name)
-        full_buff = 0
-        for name in roles_names:
-            if name.count(' речь') == 1:
-                buff = name.split(' речь')
-                if name.count('+') == 1:
-                    full_buff += int(buff[0][buff[0].find('+') + 1:])
-                elif name.count('-') == 1:
-                    full_buff -= int(buff[0][buff[0].find('-') + 1:])
-            elif name.count(' стат'):
-                buff = name.split(' стат')
-                if name.count('+') == 1:
-                    full_buff += int(buff[0][buff[0].find('+') + 1:])
-                elif name.count('-') == 1:
-                    full_buff -= int(buff[0][buff[0].find('-') + 1:])
-        if full_buff:
-            if full_buff > 0:
-                fin_string = f"{d20}(dice)+{full_buff}(orator buff)={d20 + full_buff}"
-            else:
-                fin_string = f"{d20}(dice){full_buff}(orator buff)={d20 + full_buff}"
-        else:
-            fin_string = f'{d20}(dice)+0(orator buff)={d20}'
-        await ctx.send(fin_string)
-    ora.__doc__ = """
-        {
-            "en":
-            {
-                "name": "None",
-                "description": "None"
-            },
-            "ua":
-            {
-                "name": "None",
-                "description": "None"
-            }
-        }
-        """
+    # Рол файт зрівнює чи дайс >= КД
+    # Якщо менше:
+    # Надсилає що не попали
+    # Якщо більше:
+    # Кидається окремий дайс на дамаг від n1 до n2
 
-    @commands.command(aliases=['roll_erudit'])
-    async def _eru(self, ctx, arg=0):
-        roles = ctx.message.author.roles
-        roles_names = []
-        d20 = random.randint(1, 20)
-        for role in roles:
-            roles_names.append(role.name)
-        full_buff = 0
-        for name in roles_names:
-            if name.count(' эруд') == 1:
-                buff = name.split(' эруд')
-                if name.count('+') == 1:
-                    full_buff += int(buff[0][buff[0].find('+') + 1:])
-                elif name.count('-') == 1:
-                    full_buff -= int(buff[0][buff[0].find('-') + 1:])
-            elif name.count(' стат'):
-                buff = name.split(' стат')
-                if name.count('+') == 1:
-                    full_buff += int(buff[0][buff[0].find('+') + 1:])
-                elif name.count('-') == 1:
-                    full_buff -= int(buff[0][buff[0].find('-') + 1:])
-        if full_buff:
-            if full_buff > 0:
-                fin_string = f"{d20}(dice)+{full_buff}(int. buff)={d20 + full_buff}"
-            else:
-                fin_string = f"{d20}(dice){full_buff}(int. buff)={d20 + full_buff}"
-        else:
-            fin_string = f'{d20}(dice)+0(int. buff)={d20}'
-        await ctx.send(fin_string)
+    # Фул_дамаг = Дамаг-КД/2
+
+    # Останнє число видається гравцю
+    
+    
 def setup(client):
     client.add_cog(BBRP(client))
