@@ -1,7 +1,6 @@
 import discord
 from discord.ext import commands
 import random
-from google import google as google_s
 from pymongo import MongoClient
 import requests
 import math
