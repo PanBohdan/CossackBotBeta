@@ -10,6 +10,8 @@ m_client = MongoClient(os.environ.get('DB'))
 db = m_client['my_db']
 hooks_collection = db['hooks']
 server_languages_collection = db['server_languages']
+
+
 class BBRP(commands.Cog):
     def __init__(self, client):
         self.client = client
