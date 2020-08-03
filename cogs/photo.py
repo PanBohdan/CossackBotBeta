@@ -49,9 +49,9 @@ class Photo(commands.Cog):
         arg2 = new_arg[1]
         images_collection.insert_one({'name': arg1, 'url': arg2})
         try:
-            localization = server_languages_collection.find_one({'id': str(ctx.guild.id)})['language']
+            localization = server_languages_collection.find_one({'id': ctx.guild.id})['language']
         except TypeError:
-            server_languages_collection.insert_one({'id': str(ctx.guild.id), 'language': 'en'})
+            server_languages_collection.insert_one({'id': ctx.guild.id, 'language': 'en'})
             localization = 'en'
         localized_answers = {'en': 'Added', 'ua': 'Додано'}
         await ctx.send(localized_answers[localization])
@@ -75,9 +75,9 @@ class Photo(commands.Cog):
     async def delete_photo(self, ctx, *, arg):
         images_collection.delete_one({'name': arg})
         try:
-            localization = server_languages_collection.find_one({'id': str(ctx.guild.id)})['language']
+            localization = server_languages_collection.find_one({'id': ctx.guild.id})['language']
         except TypeError:
-            server_languages_collection.insert_one({'id': str(ctx.guild.id), 'language': 'en'})
+            server_languages_collection.insert_one({'id': ctx.guild.id, 'language': 'en'})
             localization = 'en'
         localized_answers = {'en': 'Deleted', 'ua': 'Видалено'}
         await ctx.send(localized_answers.get(localization, default='Deleted'))

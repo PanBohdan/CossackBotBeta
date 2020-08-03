@@ -9,6 +9,7 @@ m_client = MongoClient(os.environ.get('DB'))
 
 db = m_client['my_db']
 hooks_collection = db['hooks']
+server_languages_collection = db['server_languages']
 
 
 class Games(commands.Cog):
@@ -47,9 +48,15 @@ class Games(commands.Cog):
             }
             """
 
-    @commands.command()
+    @commands.command(aliases=['пінг'])
     async def ping(self, ctx):
-        await ctx.send('Pong! {0}мс'.format(round(self.client.latency * 1000)))
+        try:
+            localization = server_languages_collection.find_one({'id': ctx.guild.id})['language']
+        except TypeError:
+            server_languages_collection.insert_one({'id': ctx.guild.id, 'language': 'en'})
+            localization = 'en'
+        localized_answers = {'en': 'Pong! {0}ms', 'ua': 'Понг! {0}мс'}
+        await ctx.send(localized_answers[localization].format(round(self.client.latency * 1000)))
     ping.__doc__ = """
             {
                 "en":
