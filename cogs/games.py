@@ -2,13 +2,11 @@ import discord
 from discord.ext import commands
 import random
 from pymongo import MongoClient
-import requests
 import os
 
 m_client = MongoClient(os.environ.get('DB'))
 
 db = m_client['my_db']
-hooks_collection = db['hooks']
 server_languages_collection = db['server_languages']
 
 
@@ -61,55 +59,86 @@ class Games(commands.Cog):
             {
                 "en":
                 {
-                    "name": "",
-                    "description": ""
+                    "name": "ping",
+                    "description": "Shows bot latency."
                 },
                 "ua":
                 {
-                    "name": "",
-                    "description": ""
+                    "name": "пінг",
+                    "description": "Показує затримку бота."
                 }
             }
             """
 
     @commands.command(aliases=['8ball', '8кулька'])
     async def _8ball(self, ctx):
-        list_of_answers = [
-            'Безперечно',
-            'На жаль, так',
-            'Так',
-            'Можеш бути впевнений в цьому',
-            'Безсумнівно',
-            'Мені здається що так',
-            'Швидше за все що так',
-            'Хороші перспективи',
-            'Знаки кажуть - так',
-            'Відповідь смутна, спробуй ще',
-            'Спитай пізніше',
-            'Краще тобі поки не казати',
-            'Не можу зараз знати',
-            'Сконцентруйся і спитай знову',
-            'Навіть не думай',
-            'Знаки кажуть - ні',
-            'Ні',
-            'Мої інформатори кажуть що ні',
-            'Перспективи не дуже',
-            'Зовсім сумнівно',
-            'На жаль, ні'
-        ]
-        rand_answer = random.choice(list_of_answers)
+        try:
+            localization = server_languages_collection.find_one({'id': ctx.guild.id})['language']
+        except TypeError:
+            server_languages_collection.insert_one({'id': ctx.guild.id, 'language': 'en'})
+            localization = 'en'
+
+        localized_answers = {
+            'ua': [
+                'Безперечно!',
+                'На жаль, так...',
+                'Так.',
+                'Можеш бути впевнений в цьому.',
+                'Безсумнівно!',
+                'Мені здається що так.',
+                'Швидше за все що так.',
+                'Хороші перспективи.',
+                'Знаки кажуть - так.',
+                'Відповідь смутна, спробуй ще.',
+                'Спитай пізніше.',
+                'Краще тобі поки не казати...',
+                'Не можу зараз знати.',
+                'Сконцентруйся і спитай знову.',
+                'Навіть не думай.',
+                'Знаки кажуть - ні.',
+                'Ні.',
+                'Мої інформатори кажуть що ні.',
+                'Перспективи не дуже.',
+                'Зовсім сумнівно.',
+                'На жаль, ні...'
+            ],
+            'en':
+            [
+                'It is certain.',
+                'It is decidedly so.',
+                'Without a doubt.',
+                'Yes – definitely.',
+                'You may rely on it.',
+                'As I see it, yes.',
+                'Most likely.',
+                'Outlook good.',
+                'Yes.',
+                'Signs point to yes',
+                'Reply hazy, try again.',
+                'Ask again later.',
+                'Better not tell you now.',
+                'Cannot predict now.',
+                'Concentrate and ask again.',
+                "Don't count on it.",
+                'My reply is no.',
+                'My sources say no.',
+                'Outlook not so good.',
+                'Very doubtful.',
+            ]
+        }
+        rand_answer = random.choice(localized_answers[localization])
         await ctx.send(rand_answer)
     _8ball.__doc__ = """
             {
                 "en":
                 {
-                    "name": "",
-                    "description": ""
+                    "name": "8ball (question)",
+                    "description": "Answers questions."
                 },
                 "ua":
                 {
-                    "name": "",
-                    "description": ""
+                    "name": "8кулька (питання)",
+                    "description": "Відповідає на запитання."
                 }
             }
             """
@@ -135,78 +164,13 @@ class Games(commands.Cog):
             {
                 "en":
                 {
-                    "name": "",
-                    "description": ""
+                    "name": "who (question)",
+                    "description": "Tells who is who."
                 },
                 "ua":
                 {
-                    "name": "",
-                    "description": ""
-                }
-            }
-            """
-
-    @commands.has_permissions(ban_members=True)
-    @commands.command(pass_context=True, aliases=['скажи'])
-    async def say(self, ctx, name, *, what_to_say):
-        name = name.lower()
-        url = hooks_collection.find_one({'name': name})['url']
-        requests.post(url, data={'content': str(what_to_say)})
-        await ctx.channel.purge(limit=1)
-    say.__doc__ = """
-            {
-                "en":
-                {
-                    "name": "",
-                    "description": ""
-                },
-                "ua":
-                {
-                    "name": "",
-                    "description": ""
-                }
-            }
-            """
-
-    @commands.has_permissions(ban_members=True)
-    @commands.command(pass_context=True, aliases=['додати_хук'])
-    async def add_hook(self, ctx, name, url):
-        name = name.lower()
-        hooks_collection.insert_one({'name': name, 'url': url})
-        await ctx.send('Додано')
-    add_hook.__doc__ = """
-            {
-                "en":
-                {
-                    "name": "",
-                    "description": ""
-                },
-                "ua":
-                {
-                    "name": "",
-                    "description": ""
-                }
-            }
-            """
-
-    @commands.command(pass_context=True, aliases=['список_хуків'])
-    async def list_hooks(self, ctx):
-        doc = hooks_collection.find()
-        tmp_str = ''
-        for j in doc:
-            tmp_str += str(j['name']) + '; '
-        await ctx.send(tmp_str)
-    list_hooks.__doc__ = """
-            {
-                "en":
-                {
-                    "name": "",
-                    "description": ""
-                },
-                "ua":
-                {
-                    "name": "",
-                    "description": ""
+                    "name": "хто (питання)",
+                    "description": "Каже хто є хто."
                 }
             }
             """
