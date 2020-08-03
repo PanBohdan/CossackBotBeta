@@ -15,24 +15,6 @@ class Games(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    @commands.command(aliases=['привіт'])
-    async def hello(self, ctx):
-        await ctx.send(f'Привіт {ctx.message.author.mention}')
-    hello.__doc__ = """
-            {
-                "en":
-                {
-                    "name": "",
-                    "description": ""
-                },
-                "ua":
-                {
-                    "name": "",
-                    "description": ""
-                }
-            }
-            """
-
     @commands.command()
     async def roll(self, ctx, dice):
         list_of_dice = []
@@ -54,7 +36,7 @@ class Games(commands.Cog):
             {
                 "en":
                 {
-                    "name": "",
+                    "name": "roll (x)d(y)",
                     "description": ""
                 },
                 "ua":
@@ -109,7 +91,6 @@ class Games(commands.Cog):
             'На жаль, ні'
         ]
         rand_answer = random.choice(list_of_answers)
-        print(rand_answer)
         await ctx.send(rand_answer)
     _8ball.__doc__ = """
             {
@@ -131,11 +112,8 @@ class Games(commands.Cog):
         ch1 = ctx.channel.guild
         list_of_guilds = self.client.guilds
         index = 0
-        print(ch1)
         for i in list_of_guilds:
-            print(i.name)
             if i.name == str(ch1):
-                print('boof')
                 guild_list = list_of_guilds[index]
                 list_of_members = guild_list.members
                 list_of_names = []
@@ -225,6 +203,7 @@ class Games(commands.Cog):
                 }
             }
             """
+
 
 def setup(client):
     client.add_cog(Games(client))

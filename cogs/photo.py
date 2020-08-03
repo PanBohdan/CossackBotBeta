@@ -24,11 +24,8 @@ class Photo(commands.Cog):
         tmp = images_collection.find_one({'name': photo_name})
         output = str(tmp['url'])
         if not output == 'None':
-            embed = discord.Embed(
-
-            )
             await ctx.send(output)
-    photo.__doc__ = """
+    photo.__doc__ = """*
         {
             "en":
             {
