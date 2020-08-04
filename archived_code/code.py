@@ -1,3 +1,5 @@
+pull test
+
 # Webhooks
 import requests
 hooks_collection = db['hooks']
