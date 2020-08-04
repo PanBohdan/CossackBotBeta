@@ -145,21 +145,11 @@ class Games(commands.Cog):
 
     @commands.command(aliases=['хто'])
     async def who(self, ctx):
-        ch1 = ctx.channel.guild
-        list_of_guilds = self.client.guilds
-        index = 0
-        for i in list_of_guilds:
-            if i.name == str(ch1):
-                guild_list = list_of_guilds[index]
-                list_of_members = guild_list.members
-                list_of_names = []
-                for j in list_of_members:
-                    list_of_names.append(j.name)
+        for index, i in enumerate(self.client.guilds):
+            if i.name == str(ctx.channel.guild):
+                guild_list = self.client.guilds[index]
                 break
-            else:
-                index += 1
-        rand_num = random.randint(0, len(list_of_names) - 1)
-        await ctx.send(list_of_names[rand_num])
+        await ctx.send(random.choice(guild_list.members).display_name)
     who.__doc__ = """
             {
                 "en":
@@ -171,6 +161,30 @@ class Games(commands.Cog):
                 {
                     "name": "хто (питання)",
                     "description": "Каже хто є хто."
+                }
+            }
+            """
+
+    @commands.command(aliases=['профіль'])
+    async def profile(self, ctx):
+        embed = discord.Embed(color=0xd2ce4e)
+        embed.add_field(name=f'Акаунт створено',
+                        value=f'{ctx.message.author.created_at.strftime("%d-%m-%Y %H:%M:%S")}', inline=True)
+        embed.add_field(name=f'Акаунт приєднався до серверу',
+                        value=f'{ctx.message.author.joined_at.strftime("%d-%m-%Y %H:%M:%S")}', inline=True)
+        embed.set_thumbnail(url=ctx.message.author.avatar_url)
+        await ctx.send(embed=embed)
+    profile.__doc__ = """
+            {
+                "en":
+                {
+                    "name": "",
+                    "description": ""
+                },
+                "ua":
+                {
+                    "name": "",
+                    "description": ""
                 }
             }
             """
