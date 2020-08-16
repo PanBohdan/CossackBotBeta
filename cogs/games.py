@@ -166,25 +166,52 @@ class Games(commands.Cog):
             """
 
     @commands.command(aliases=['профіль'])
-    async def profile(self, ctx):
+    async def profile(self, ctx, member_id=None):
+        try:
+            localization = server_languages_collection.find_one({'id': ctx.guild.id})['language']
+        except TypeError:
+            server_languages_collection.insert_one({'id': ctx.guild.id, 'language': 'en'})
+            localization = 'en'
+        localized_id_text = {
+            'en': 'Account ID',
+            'ua': 'ID акаунту',
+        }
+        localized_creation_time_text = {
+            'en': 'Account created',
+            'ua': 'Акаунт створено',
+        }
+        localized_join_time_text = {
+            'en': 'Account joined',
+            'ua': 'Акаунт приєднався',
+        }
+        if member_id:
+            member_id = member_id.replace('<', '')
+            member_id = member_id.replace('>', '')
+            member_id = member_id.replace('@', '')
+            member_id = member_id.replace('!', '')
+            member = ctx.guild.get_member(int(member_id))
+        else:
+            member = ctx.message.author
         embed = discord.Embed(color=0xd2ce4e)
-        embed.add_field(name=f'Акаунт створено',
-                        value=f'{ctx.message.author.created_at.strftime("%d-%m-%Y %H:%M:%S")}', inline=True)
-        embed.add_field(name=f'Акаунт приєднався до серверу',
-                        value=f'{ctx.message.author.joined_at.strftime("%d-%m-%Y %H:%M:%S")}', inline=True)
-        embed.set_thumbnail(url=ctx.message.author.avatar_url)
+        embed.add_field(name=localized_id_text[localization],
+                        value=member.id, inline=True)
+        embed.add_field(name=localized_creation_time_text[localization],
+                        value=member.created_at.strftime("%d-%m-%Y %H:%M:%S"), inline=False)
+        embed.add_field(name=localized_join_time_text[localization],
+                        value=member.joined_at.strftime("%d-%m-%Y %H:%M:%S"), inline=True)
+        embed.set_thumbnail(url=member.avatar_url)
         await ctx.send(embed=embed)
     profile.__doc__ = """
             {
                 "en":
                 {
-                    "name": "",
-                    "description": ""
+                    "name": "profile [none or ping ore id]",
+                    "description": "Shows profile info."
                 },
                 "ua":
                 {
-                    "name": "",
-                    "description": ""
+                    "name": "профіль [нічого, або пінг, або ID]",
+                    "description": "Показує інформацію про профіль."
                 }
             }
             """
