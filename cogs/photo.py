@@ -1,4 +1,3 @@
-import discord
 from discord.ext import commands
 import random
 import os
@@ -21,8 +20,7 @@ class Photo(commands.Cog):
     @commands.command(pass_context=True, aliases=['фото', 'стікер'])
     async def photo(self, ctx, photo_name):
         await ctx.channel.purge(limit=1)
-        tmp = images_collection.find_one({'name': photo_name})
-        output = str(tmp['url'])
+        output = str(images_collection.find_one({'name': photo_name})['url'])
         if not output == 'None':
             await ctx.send(output)
     photo.__doc__ = """*
@@ -43,11 +41,8 @@ class Photo(commands.Cog):
     @commands.has_role('адмін фоток')
     @commands.command(pass_context=True, aliases=['додати_фото', 'додати_стікер'])
     async def add_photo(self, ctx, *, photo_name_and_url):
-        new_arg = photo_name_and_url.split('|')
-        print(new_arg)
-        arg1 = new_arg[0]
-        arg2 = new_arg[1]
-        images_collection.insert_one({'name': arg1, 'url': arg2})
+        photo_name_and_url = photo_name_and_url.split('|')
+        images_collection.insert_one({'name': photo_name_and_url[0], 'url': photo_name_and_url[1]})
         try:
             localization = server_languages_collection.find_one({'id': ctx.guild.id})['language']
         except TypeError:
@@ -99,8 +94,7 @@ class Photo(commands.Cog):
     @commands.command(pass_context=True, aliases=['випадкове_фото', 'рандомний_стікер'])
     async def random_photo(self, ctx):
         await ctx.channel.purge(limit=1)
-        col_dict = dict(images_collection.find())
-        await ctx.send(random.choice(col_dict.values))
+        await ctx.send(random.choice(dict(images_collection.find()).values))
     random_photo.__doc__ = """
         {
             "en":
@@ -118,17 +112,16 @@ class Photo(commands.Cog):
 
     @commands.command(pass_context=True, aliases=['список_фото', 'список_стікерів'])
     async def list_photo(self, ctx):
-        doc = images_collection.find()
         all_images_list = []
         tmp_str = ''
-        for j in doc:
+        for j in images_collection.find():
             if len(tmp_str + str(j['name']) + ';') < 2000:
                 tmp_str += str(j['name'])+'; '
             else:
                 all_images_list.append(tmp_str)
                 tmp_str = ''
-        for ls in all_images_list:
-            await ctx.send(ls)
+        for text in all_images_list:
+            await ctx.send(text)
     list_photo.__doc__ = """
         {
             "en":
